@@ -6,15 +6,15 @@ var http = require('http');
 var https = require('https');
 const fs = require('fs');
 var port = normalizePort(process.env.PORT || '3000');
-const options = {
-  key: fs.readFileSync('./private.pem'),
-  cert: fs.readFileSync('./public.pem')
-};
+// const options = {
+//   key: fs.readFileSync('./private.pem'),
+//   cert: fs.readFileSync('./public.pem')
+// };
 
 app.set('port', port);
 
+var server = https.createServer(app);
 // var server = https.createServer(options,app);
-var server = https.createServer(options,app);
 const io = require('socket.io')(server);
 
 io.on('connection', (socket) => {
