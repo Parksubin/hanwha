@@ -12,7 +12,7 @@ var port = normalizePort(process.env.PORT || '3000');
 // };
 
 app.set('port', port);
-
+// gn...
 var server = http.createServer(app);
 // var server = https.createServer(options,app);
 const io = require('socket.io')(server);
