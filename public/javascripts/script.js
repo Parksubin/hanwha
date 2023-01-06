@@ -5,8 +5,8 @@ const myVideo = document.createElement('video');
 myVideo.muted = true;
 myVideo.setAttribute('autoplay','autoplay');
 myVideo.setAttribute('playsinline', '');
+myVideo.setAttribute('controls','')
 const peers = {};
-
 // 유저의 브라우저로부터 Media Device들을 받아오는 과정
 console.log("#############=>",navigator.platform)
 var constraints = { audio: true, video: { width: 1280, height: 720 } };
@@ -51,6 +51,25 @@ navigator.mediaDevices
     });
 });
 
+$('#msg-send').click(() => {
+  socket.emit('request_message', $('#m').val());
+  $('#m').val('');
+  return false; 
+});
+
+socket.on('response_message', (masg) => {
+  var titles='';
+  console.log("myPeer",myPeer)
+  console.log("peers",peers)
+  // if(Object.keys(peers).length === 0){
+  //   titles = myPeer._id;
+  // }else{
+  //   titles = peers;
+  // }
+  // console.log("titles:",titles)
+  $('#messages').prepend($('<li>').text(masg));
+});
+
 /*
 유저가 나간 경우에 socket.io에서는 자동으로 'disconnect' 이벤트를 발생시킨다.
 이 경우 다른 peer의 stream을 close 시키는 코드이다.
@@ -58,7 +77,10 @@ navigator.mediaDevices
 socket.on('user-disconnected', (userId) => {
   console.log("user-disconnected user ID : ",userId)
   console.log("peers : ",peers)
-  if (peers[userId]) peers[userId].close();
+  if (peers[userId]){
+    console.log("peer 배열에 userId가 존재한다.")
+    peers[userId].close();
+  }
   console.log("peers : ",peers)
 });
 
@@ -68,10 +90,10 @@ open 이벤트가 발생하면 url의 uuid를 통해 유저를 room에 join 시�
 간단하게 설명하면 유저가 들어오면 room에 join 시킨다고 보면 된다.
 */
 myPeer.on('open', (id) => {
+  console.log("peers",peers)
   console.log("peer on  | AND ROOM_ID , id : " , ROOM_ID+"/"+id)
   socket.emit('join-room', ROOM_ID, id);
 });
-
 
 /*
 위에서 간략하게 설명했는데 다시 한 번 설명하자면 다음과 같다.
@@ -102,6 +124,7 @@ function addVideoStream(video, stream) {
   video.srcObject = stream;
   video.setAttribute('autoplay','autoplay');
   video.setAttribute('playsinline', '');
+  video.setAttribute('controls','')
   video.addEventListener('loadedmetadata', () => {
     video.play();
   });
